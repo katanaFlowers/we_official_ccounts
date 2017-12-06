@@ -1,0 +1,402 @@
+<?php
+header("content-type:text/html;charset=utf-8");
+date_default_timezone_set("PRC");
+//加载分词函数
+require("fc.php");
+/**
+  * wechat php test
+  */
+
+//define your token
+define("TOKEN", "nnnan");
+//判断是否未验证或是接收消息
+$wechat = new weChat();
+if(isset($_GET['echostr'])){
+  $wechat -> valid();
+} else {
+  $wechat -> responseMsg();
+}
+
+
+class weChat
+{
+  //验证公众号接口配置
+	public function valid()
+    {
+        $echoStr = $_GET["echostr"];
+
+        //valid signature , option
+        if($this->checkSignature()){
+        	echo $echoStr;
+        	exit;
+        }
+    }
+
+    public function responseMsg()
+    {
+		//get post data, May be due to the different environments
+    //接收消息，放在postStr变量 xml格式
+		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+
+      	//extract post data
+        //返回消息
+		if (!empty($postStr)){
+                //写入日志,G表示收到消息
+                $this -> logger("G \r\n".$postStr);
+
+                //xml消息模板
+              	$postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+                $RX_type = $postObj ->MsgType;
+                //判断用户输入信息的类型
+                switch ($RX_type) {
+                  case 'text':
+                    $result = $this -> receiveText($postObj);
+                    break;
+                  case 'iamge':
+                    $result = $this -> receiveImage($postObj);
+                    break;
+                  case 'voice':
+                    $result = $this -> receiveVoice($postObj);
+                    break;
+                  case 'video':
+                    $result = $this -> receiveVideo($postObj);
+                    break;
+                  case 'shortvideo':
+                    $result = $this -> receiveShortVideo($postObj);
+                    break;
+                  case 'location':
+                   $result = $this -> receiveLocayion($postObj);
+                    break;
+                  case 'link':
+                    $result = $this -> receiveLink($postObj);
+                    break;
+                  case 'event':
+                    $result = $this -> receiveEvent($postObj);
+                    break;
+
+                  default:
+                    $result = "请尝试输入其他的关键词~~";
+                    break;
+                }
+        //  写入返回给用户的日志信息
+            $this -> logger("P \r\n".$result);
+            echo $result;
+    } else {
+        echo "";
+        exit;
+    }
+  }
+
+
+//处理event事件
+private function receiveEvent($postObj)
+{
+     //判断事件类型
+     $event_type = $postObj->Event;
+
+     switch ($event_type) {
+       case 'subscribe':
+         $contentStr = "欢迎关注-喃楠楠-的微信公众号~~ \r\n要乖乖嘚~>.<~";
+         $result = $this -> xmlText($postObj,$contentStr);
+         return $result;
+         break;
+
+       case 'unsubscribe':
+
+         $contentStr = "Orzm~~";
+         $result = $this -> xmlText($postObj,$contentStr);
+         return $result;
+         break;
+
+       case 'SCAN':
+             # code...
+         break;
+       case 'CLICK':
+
+         $key = $postObj ->EvnetKey;
+         if($key == "wordkey" )
+         {
+           $contentStr[] = array('title'=>'又是爱抖露！栃木县吉祥物「まろにえ～る」动画化&单行本发售','description'=>"",'picurl'=>'https://mmbiz.qpic.cn/mmbiz_jpg/yGGibulWKW6DGxaHlRMwlaW1aY8ibOUUYLlKevmduH93R3QZc8U36t9NrKCLYYlleV6M1MZTgIAv2uclhNL3E5Qg/0?wx_fmt=jpeg',
+           'url'=>'http://mp.weixin.qq.com/s/-K-XZc7O5yS2l_piHtn7ZA');
+
+         }
+          $result = $this ->xmlNews($postObj,$contentStr);
+          return $result;  
+         break;
+       case 'LOCATION':
+             # code...
+         break;
+
+       default:
+         # code...
+         break;
+     }
+}
+
+     // 处理文本信息
+   private function receiveText($postObj)
+   {
+     $content = trim($postObj ->Content) ;
+     if(strstr($content,"水果"))
+     {
+       $contentStr = "水果，是指多汁且主要味觉为甜味和酸味，可食用的植物果实。水果不但含有丰富的营养，而且能够帮助消化。";
+     } elseif (strstr($content,"图文")) {
+       $contentStr = array();
+       $contentStr[] = array('title'=>'巨乳大姐姐x柔弱中学生？「春原庄的管理人」决定动画化！','description'=>"",'picurl'=>'https://mmbiz.qpic.cn/mmbiz_jpg/yGGibulWKW6DGxaHlRMwlaW1aY8ibOUUYL95Zlpgpjt94HNIL7O1TEicC2riaErnPlrRXuKFkPxXVfMJyFa4xAwm2A/0?wx_fmt=jpeg',
+       'url'=>'http://mp.weixin.qq.com/s/_GVKYwUgUCrE0BilNY5Etw');
+     }
+     elseif (strstr($content,"最新消息")) {
+       $contentStr = array();
+       $contentStr[] = array('title'=>'巨乳大姐姐x柔弱中学生？「春原庄的管理人」决定动画化！','description'=>"",'picurl'=>'https://mmbiz.qpic.cn/mmbiz_jpg/yGGibulWKW6DGxaHlRMwlaW1aY8ibOUUYL95Zlpgpjt94HNIL7O1TEicC2riaErnPlrRXuKFkPxXVfMJyFa4xAwm2A/0?wx_fmt=jpeg',
+       'url'=>'http://mp.weixin.qq.com/s/_GVKYwUgUCrE0BilNY5Etw');
+       $contentStr[] = array('title'=>'又是爱抖露！栃木县吉祥物「まろにえ～る」动画化&单行本发售','description'=>"",'picurl'=>'https://mmbiz.qpic.cn/mmbiz_jpg/yGGibulWKW6DGxaHlRMwlaW1aY8ibOUUYLlKevmduH93R3QZc8U36t9NrKCLYYlleV6M1MZTgIAv2uclhNL3E5Qg/0?wx_fmt=jpeg',
+       'url'=>'http://mp.weixin.qq.com/s/-K-XZc7O5yS2l_piHtn7ZA');
+     } elseif (strstr($content,"音乐")) {
+       $contentStr = array();
+       $contentStr[] = array('title'=>'life','description'=>'歌手：YUI(吉冈 唯)','musicurl'=>'http://nnnangood66.duapp.com/music/YUI-LIFE.mp3','HQ_url'=>'http://nnnangood66.duapp.com/music/YUI-LIFE.mp3');
+     } else {
+       $contentStr = "请输入其他的试试~~";
+     }
+      if(isset($contentStr[0]['picurl']))
+       {
+         $result = $this -> xmlNews($postObj,$contentStr);
+         return $result;
+       } elseif (isset($contentStr[0]['musicurl'])) {
+         $result = $this -> xmlMusic($postObj,$contentStr);
+         return $result;
+       } else {
+         $result = $this -> xmlText($postObj,$contentStr);
+         return $result;
+       }
+   }
+
+
+   //接收视频消息
+     private function receiveVideo($postObj)
+     {
+         $contentStr = $postObj->MediaId;
+         $result = $this->xmlVideo($postObj, $contentStr);
+         return $result;
+     }
+
+
+
+     //接收图片消息
+       private function receiveImage($postObj)
+       {
+           $contentStr = $postObj->MediaId;
+           $result = $this->xmlImage($postObj, $contentStr);
+           return $result;
+       }
+
+
+//接收语音消息
+private function receiveVoice($postObj)
+{
+  if(isset($postObj->Recognition) && !empty($postObj->Recognition))
+  {
+    $text = $postObj->Recognition;
+    $city = fwords($text);
+    $weather = getWeather($city);
+    $contentStr = $this ->weatherCate($weather,$city);
+    if(is_array($contentStr))
+    $result = $this -> xmlNews($postObj,$contentStr);
+    else
+    $result = $this -> xmlText($postObj,$contentStr);
+  } else {
+    $contentStr = $postObj->MediaId;
+  $result = $this ->xmlVoice($postObj,$contentStr);
+}
+  return $result;
+}
+
+//回复语音消息
+private function xmlVoice($postObj,$contentStr)
+{
+  $voiceTpl = " <xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[voice]]></MsgType>
+<Voice>
+<MediaId><![CDATA[%s]]></MediaId>
+</Voice>
+</xml> ";
+   return sprintf($voiceTpl,$postObj->FromUserName,$postObj->ToUserName,time(),$contentStr);
+}
+
+//回复视频消息
+  private function xmlVideo($postObj, $contentStr)
+            {
+                $itemTpl = "<Video>
+            <MediaId><![CDATA[%s]]></MediaId>
+          </Video>";
+
+                $item_str = sprintf($itemTpl, $contentStr);
+
+                $xmlTpl = "<xml>
+          <ToUserName><![CDATA[%s]]></ToUserName>
+          <FromUserName><![CDATA[%s]]></FromUserName>
+          <CreateTime>%s</CreateTime>
+          <MsgType><![CDATA[video]]></MsgType>
+          $item_str
+          </xml>";
+
+                $result = sprintf($xmlTpl, $postObj->FromUserName, $postObj->ToUserName, time());
+                return $result;
+            }
+
+
+//返回xml图片格式
+     private function xmlImage($postObj, $contentStr)
+       {
+           $itemTpl = "<Image>
+       <MediaId><![CDATA[%s]]></MediaId>
+     </Image>";
+
+           $item_str = sprintf($itemTpl, $contentStr);
+
+           $xmlTpl = "<xml>
+     <ToUserName><![CDATA[%s]]></ToUserName>
+     <FromUserName><![CDATA[%s]]></FromUserName>
+     <CreateTime>%s</CreateTime>
+     <MsgType><![CDATA[image]]></MsgType>
+     $item_str
+     </xml>";
+
+           $result = sprintf($xmlTpl, $postObj->FromUserName, $postObj->ToUserName, time());
+           return $result;
+       }
+
+
+//图文信息返回
+private function xmlNews($postObj,$contentStr)
+{
+  $itemTpl ="<item>
+  <Title><![CDATA[%s]]></Title>
+  <Description><![CDATA[%s]]></Description>
+  <PicUrl><![CDATA[%s]]></PicUrl>
+  <Url><![CDATA[%s]]></Url>
+  </item>";
+     foreach($contentStr as $vo)
+     {
+       $item .= sprintf($itemTpl,$vo['title'],$vo['description'],$vo['picurl'],$vo['url']);
+     }
+  $xmlNews = " <xml>
+  <ToUserName><![CDATA[%s]]></ToUserName>
+  <FromUserName><![CDATA[%s]]></FromUserName>
+  <CreateTime>%s</CreateTime>
+  <MsgType><![CDATA[news]]></MsgType>
+  <ArticleCount>%s</ArticleCount>
+  <Articles>
+  $item
+  </Articles>
+  </xml> ";
+    return sprintf($xmlNews,$postObj->FromUserName,$postObj->ToUserName,time(),count($contentStr));
+}
+
+
+//返回音乐信息
+private function xmlMusic($postObj,$contentStr)
+{
+  $music = "<Music>
+  <Title><![CDATA[%s]]></Title>
+  <Description><![CDATA[%s]]></Description>
+  <MusicUrl><![CDATA[%s]]></MusicUrl>
+  <HQMusicUrl><![CDATA[%s]]></HQMusicUrl>
+  </Music> ";
+
+       $musicXml =sprintf($music,$contentStr[0]['title'],$contentStr[0]['description'],$contentStr[0]['musicurl'],$contentStr[0]['HQ_url']);
+
+  $musicTpl= " <xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[music]]></MsgType>
+   $musicXml
+</xml> ";
+    return sprintf($musicTpl,$postObj->FromUserName,$postObj->ToUserName,time());
+}
+
+
+
+//把文本转换为xml格式信息
+   private function xmlText($postObj,$contentStr)
+   {
+   $xmlTpl = "
+<xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%s</CreateTime>
+<MsgType><![CDATA[text]]></MsgType>
+<Content><![CDATA[%s]]></Content>
+</xml>
+  ";
+   $result = sprintf($xmlTpl,$postObj->FromUserName,$postObj->ToUserName,time(),$contentStr);
+   return $result;
+   }
+
+
+
+
+//日志记录
+private function logger($log_content)
+    {
+
+    	$max_size = 100000;   //声明日志的最大尺寸
+
+    	$log_filename = "log.xml";  //日志名称
+
+      //如果文件存在并且大于了规定的最大尺寸就删除了
+    	if(file_exists($log_filename) && (abs(filesize($log_filename)) > $max_size)){
+    		  unlink($log_filename);
+    	 }
+
+    	 //写入日志，内容前加上时间， 后面加上换行， 以追加的方式写入
+    	file_put_contents($log_filename, date('H:i:s',time())." ".$log_content."\r\n", FILE_APPEND);
+
+     }
+
+
+//选出有用的天气消息返回给用户
+private function weatherCate($weather,$city)
+{
+  if($weather['status']==200)
+  {
+    $contentStr[] = array("title"=>"{$city}未来五天的天气消息  ","description"=>"","picurl"=>"","url"=>"");
+    $contentStr[] = array("title"=>"{$weather['data']['forecast']['0']['date']} {$weather['data']['forecast']['0']['type']} {$weather['data']['forecast']['0']['high']} {$weather['data']['forecast']['0']['low']} 空气质量指数：{$weather['data']['forecast']['0']['aqi']} 小建议：{$weather['data']['forecast']['0']['notice']}","description"=>"","picurl"=>"","url"=>"" );
+    $contentStr[] = array("title"=>"{$weather['data']['forecast']['1']['date']} {$weather['data']['forecast']['1']['type']} {$weather['data']['forecast']['1']['high']} {$weather['data']['forecast']['1']['low']} 空气质量指数：{$weather['data']['forecast']['1']['aqi']} 小建议：{$weather['data']['forecast']['1']['notice']}","description"=>"","picurl"=>"","url"=>"");
+    $contentStr[] = array("title"=>"{$weather['data']['forecast']['2']['date']} {$weather['data']['forecast']['2']['type']} {$weather['data']['forecast']['2']['high']} {$weather['data']['forecast']['2']['low']} 空气质量指数：{$weather['data']['forecast']['2']['aqi']} 小建议：{$weather['data']['forecast']['2']['notice']}","description"=>"","picurl"=>"","url"=>"");
+    $contentStr[] = array("title"=>"{$weather['data']['forecast']['3']['date']} {$weather['data']['forecast']['3']['type']} {$weather['data']['forecast']['3']['high']} {$weather['data']['forecast']['3']['low']} 空气质量指数：{$weather['data']['forecast']['3']['aqi']} 小建议：{$weather['data']['forecast']['3']['notice']}","description"=>"","picurl"=>"","url"=>"");
+    $contentStr[] = array("title"=>"{$weather['data']['forecast']['4']['date']} {$weather['data']['forecast']['4']['type']} {$weather['data']['forecast']['4']['high']} {$weather['data']['forecast']['4']['low']} 空气质量指数：{$weather['data']['forecast']['4']['aqi']} 小建议：{$weather['data']['forecast']['4']['notice']}","description"=>"","picurl"=>"","url"=>"");
+
+  } else {
+    $contentStr = "未发现".$city."城市的天气消息~~";
+  }
+
+  return $contentStr;
+}
+
+//核定公众号接口配置暗号
+	private function checkSignature()
+	{
+        $signature = $_GET["signature"];
+        $timestamp = $_GET["timestamp"];
+        $nonce = $_GET["nonce"];
+
+		$token = TOKEN;
+		$tmpArr = array($token, $timestamp, $nonce);
+		sort($tmpArr);
+		$tmpStr = implode( $tmpArr );
+		$tmpStr = sha1( $tmpStr );
+
+		if( $tmpStr == $signature ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+}
+
+
+?>

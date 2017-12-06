@@ -1,0 +1,12 @@
+<?php
+
+require("phpanalysis.class.php");
+
+$pa = new PhpAnalysis();
+$pa -> SetSource("这是一个分词测试");
+$pa -> resultType = 2;
+$pa -> differMax = true;
+$pa -> StartAnalysis();
+$result = $pa -> GetFinallyResult();
+$arr = explode(' ',$result);
+ var_dump($arr);

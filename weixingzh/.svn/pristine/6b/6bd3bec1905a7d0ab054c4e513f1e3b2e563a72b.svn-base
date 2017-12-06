@@ -1,0 +1,10 @@
+<?php
+
+$con = mysql_connect('MYSQL5005.webweb.com','9a778b_blog','13145837');
+
+  mysql_select_db('db_9a778b_blog');
+if($con)
+echo "chengg";
+
+
+ ?>

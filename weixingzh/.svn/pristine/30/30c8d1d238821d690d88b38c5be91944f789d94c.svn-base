@@ -1,0 +1,22 @@
+<?php
+
+
+//分词函数
+function fc($data)
+{
+  //初始化curl资源，用来调用分词api
+  $fwords = curl_init();
+
+  //API地址
+  $url = "http://www.xunsearch.com/scws/api.php";
+
+  curl_setopt($fwords,CURLOPT_URL,$url);
+  curl_setopt($fwords,CURLOPT_POST,1);
+  curl_setopt($fwords,CURLOPT_POSTFIELDS,$data);
+  curl_setopt($fwords,CURLOPT_RETURNTRANSFER,1);
+
+  $output = curl_exec($fwords);
+  curl_close($fword);
+  return $output;
+}
+echo fc("这是一个分词测试");

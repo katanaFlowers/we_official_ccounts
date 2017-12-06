@@ -1,0 +1,13 @@
+<?php
+
+$con = mysql_connect('sqld.duapp.com','a63551c0c1894694af5fa5e69ee4e99c','9a0ee26e2db74787b3e869bac1bd148d');
+if($con)
+{
+  mysql_select_db('rRUoXOlEECabRXFKiJdt',$con);
+  echo "成功";
+}  else {
+
+  echo "失败";
+}
+
+ ?>

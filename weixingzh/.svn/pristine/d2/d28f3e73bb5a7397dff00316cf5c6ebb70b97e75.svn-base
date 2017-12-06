@@ -1,0 +1,41 @@
+
+<html>
+<head>
+<meta http-equiv="content-type" charset="utf-8" />
+<title>媒体文件列表</title>
+</head>
+
+<body>
+<h2>多媒体文件列表</h2>
+<p><a href="">图片</a> |
+   <a href="">音频</a> |
+   <a href="">视频</a> |
+   <a href="">缩略图</a> |
+   <a href="">图文</a> | 
+</p>
+<table cellspacing="1" cellpadding="1" width="80%" >
+  <tr>
+    <th>ID</th>
+    <th>文件名</th>
+    <th>类型</th>
+    <th>Media_id</th>
+    <th>创建时间</th>
+  </tr>
+</table>
+
+<!-- 上传文件表单 -->
+<form action="" method="post" enctype="multipart/form-data">
+
+<label>上传文件：</label>
+<input type="file" name="up_file" />
+<select name="file_type">
+  <option name="image">图片</option>
+  <option name="voice">音频</option>
+  <option name="vedio">视频</option>
+  <option name="thumb">缩略图</option>
+<input type="submit" name="dosubmit" value="上传" />
+</select>
+</form>
+
+</body>
+</html>

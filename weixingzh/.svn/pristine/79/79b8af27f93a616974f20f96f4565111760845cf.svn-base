@@ -1,0 +1,90 @@
+
+<html>
+<head>
+<meta http-equiv="content-type" charset="utf-8" />
+<title>媒体文件列表</title>
+</head>
+
+<body>
+<h2>多媒体文件列表</h2>
+<p><a href="file_list.php?type=image">图片</a> |
+   <a href="file_list.php?type=voice">音频</a> |
+   <a href="file_list.php?type=vedio">视频</a> |
+   <a href="file_list.php?type=thumb">缩略图</a> |
+   <a href="file_list.php?type=news">图文</a> |
+</p>
+<table cellspacing="1" border="1" cellpadding="1" width="80%" >
+  <tr>
+    <th>ID</th>
+    <th>文件名</th>
+    <th>类型</th>
+    <th>Media_id</th>
+    <th>创建时间</th>
+  </tr>
+</table>
+<br>
+<br>
+<p><pre>
+  图片（image）: 2M，支持bmp/png/jpeg/jpg/gif格式
+  语音（voice）：2M，播放长度不超过60s，mp3/wma/wav/amr格式
+  视频（video）：10MB，支持MP4格式
+  缩略图（thumb）：64KB，支持JPG格式
+</pre></p>
+<!-- 上传文件表单 -->
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
+
+<label>上传文件：</label>
+<input type="file" name="up_file" />
+<select name="file_type">
+  <option name="image">图片</option>
+  <option name="voice">音频</option>
+  <option name="vedio">视频</option>
+  <option name="thumb">缩略图</option>
+<input type="submit" name="dosubmit" value="上传" />
+</select>
+</form>
+
+<!-- 处理上传文件的函数 -->
+<?php
+
+include "fileupload.class.php";
+include "../curl.php";
+
+//判断是否提交数据
+if(isset($_POST['dosubmit']))
+{
+  //实例化上传文件对象
+  $upFile = new FileUpload();
+
+  //配置允许上传的文件格式
+  $upFile->set('allowtype',array('bmp','png','jpeg','jpg','gif','mp3','wma','wav','amr','mp4'));
+
+  //处理上传文件
+  if($upFile->upload('up_file'))
+  {
+
+    //上传成功，获取上传文件文件名
+    $filename = $upFile ->getFileName();
+    $access_token = get_token();
+    //获取media_id接口链接
+    $media_url = "https://api.weixin.qq.com/cgi-bin/material/add_material?access_token={$access_token}&type={$_POST['file_type']}";
+    //获取文件绝对地址
+    $filepath = dirname(__FILE__).'/uploads/'.$filename;
+    //形成获取media_id的数据格式
+    $filedata = array("media"=>"@".$filepath);
+    $result = https_request($media_url,$filedata);
+
+    $data = json_decode($result,true);
+    if($_POST['file_type'] == "thumb")
+    {
+      $data['media_id'] = $data['thumb_media_id'];
+    }
+    echo $data['media_id'];
+  } else {
+    echo $upFile->getErrorMsg();
+  }
+}
+
+ ?>
+</body>
+</html>

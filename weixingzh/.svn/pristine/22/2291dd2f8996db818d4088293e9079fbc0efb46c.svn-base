@@ -1,0 +1,153 @@
+<?php
+header("content-type:text/html;charset=utf-8");
+date_default_timezone_set("PRC");
+/**
+  * wechat php test
+  */
+
+//define your token
+define("TOKEN", "nnnan");
+//判断是否未验证或是接收消息
+$wechat = new weChat();
+if(isset($_GET['echostr'])){
+  $wechat -> valid();
+} else {
+  $wechat -> responseMsg();
+}
+
+
+class weChat
+{
+  //验证公众号接口配置
+	public function valid()
+    {
+        $echoStr = $_GET["echostr"];
+
+        //valid signature , option
+        if($this->checkSignature()){
+        	echo $echoStr;
+        	exit;
+        }
+    }
+
+    public function responseMsg()
+    {
+		//get post data, May be due to the different environments
+    //接收消息，放在postStr变量 xml格式
+		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+
+      	//extract post data
+        //返回消息
+		if (!empty($postStr)){
+                //写入日志,G表示收到消息
+                $this -> logger("G \r\n".$postStr);
+
+                //xml消息模板
+              	$postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+                $RX_type = $postObj ->MsgType;
+                //判断用户输入信息的类型
+                switch ($RX_type) {
+                  case 'text':
+                    $result = $this -> receiveText($postObj);
+                    break;
+                  case 'iamge':
+                      # code...
+                    break;
+                  case 'voice':
+                      # code...
+                    break;
+                  case 'video':
+                      # code...
+                    break;
+                  case 'shortvideo':
+                      # code...
+                    break;
+                  case 'location':
+                      # code...
+                    break;
+                  case 'link':
+                      # code...
+                    break;
+
+                  default:
+                    $result = "请尝试输入其他的关键词~~";
+                    break;
+                }
+        //  写入返回给用户的日志信息
+            $this -> logger("P \r\n".$result);
+            echo $result;
+    } else {
+        echo "";
+        exit;
+    }   // 处理文本信息
+  }
+   private function receiveText($postObj)
+   {
+     $content = trim($postObj ->Content) ;
+     if(strstr($content,"水果"))
+     {
+       $contentStr = "水果，是指多汁且主要味觉为甜味和酸味，可食用的植物果实。水果不但含有丰富的营养，而且能够帮助消化。";
+       $result = $this -> xmlText($postObj,$contentStr);
+       return $result;
+     }
+   }
+   //把文本转换为xml格式信息
+   private function xmlText($postObj,$contentStr)
+   {
+   $xmlTpl = "
+     <xml>
+      <ToUserName><![CDATA[%s]]></ToUserName>
+      <FromUserName><![CDATA[%s]]></FromUserName>
+      <CreateTime>%s</CreateTime>
+      <MsgType><![CDATA[text]]></MsgType>
+      <Content><![CDATA[%s]]></Content>
+      <MsgId>%s</MsgId>
+      </xml>
+  ";
+   $result = sprintf($xmlTpl,$postObj->FromUserName,$postObj->ToUserName,time(),$contentStr);
+   return $result;
+   }
+
+
+
+//日志记录
+private function logger($log_content)
+    {
+
+    	$max_size = 100000;   //声明日志的最大尺寸
+
+    	$log_filename = "log.xml";  //日志名称
+
+      //如果文件存在并且大于了规定的最大尺寸就删除了
+    	if(file_exists($log_filename) && (abs(filesize($log_filename)) > $max_size)){
+    		  unlink($log_filename);
+    	 }
+
+    	 //写入日志，内容前加上时间， 后面加上换行， 以追加的方式写入
+    	file_put_contents($log_filename, date('H:i:s',time())." ".$log_content."\r\n", FILE_APPEND);
+
+     }
+
+//核定公众号接口配置暗号
+	private function checkSignature()
+	{
+        $signature = $_GET["signature"];
+        $timestamp = $_GET["timestamp"];
+        $nonce = $_GET["nonce"];
+
+		$token = TOKEN;
+		$tmpArr = array($token, $timestamp, $nonce);
+		sort($tmpArr);
+		$tmpStr = implode( $tmpArr );
+		$tmpStr = sha1( $tmpStr );
+
+		if( $tmpStr == $signature ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+}
+
+
+?>

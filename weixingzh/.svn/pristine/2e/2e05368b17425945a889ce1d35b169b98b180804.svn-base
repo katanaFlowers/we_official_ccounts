@@ -1,0 +1,113 @@
+<?php
+
+
+
+
+//获取access_token函数
+  function https_request($url,$data = null)
+  {
+    //获取一个curl资源
+      $ch = curl_init();
+
+    //设置相关参数
+      curl_setopt($ch,CURLOPT_URL,"$url");
+    //https协议
+      curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
+      curl_setopt($ch,CURLOPT_SSL_VERIFYHOST,false);
+    if(!empty($data))
+    {
+      curl_setopt($ch,CURLOPT_POST,1);
+      curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+    }
+      curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+
+    //获取html结果
+      $output = curl_exec($ch);
+    //释放curl句柄
+      curl_close($ch);
+    //打印获取的信息
+    return json_decode($output,true);
+  }
+
+//获取accesstoken
+  function get_token()
+  {
+    //appID
+      $appID = "wx2706cfd1ecb03462";
+    //APPSECRET
+      $secret = "275d0488db74be5cceb4f420336856f5";
+    //access_token接口
+      $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appID}&secret={$secret}";
+      $result = https_request($url);
+      return $result['access_token'];
+  }
+
+//$access_token取得接口变量
+  $access_token = get_token();
+
+//添加自定义菜单接口url
+  $menuurl =  "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={$access_token}";
+//自定义菜单json数组
+  $data = {
+    "button": [
+        {
+            "name": "扫码",
+            "sub_button": [
+                {
+                    "type": "scancode_waitmsg",
+                    "name": "扫码带提示",
+                    "key": "rselfmenu_0_0",
+                    "sub_button": [ ]
+                },
+                {
+                    "type": "scancode_push",
+                    "name": "扫码推事件",
+                    "key": "rselfmenu_0_1",
+                    "sub_button": [ ]
+                }
+            ]
+        },
+        {
+            "name": "发图",
+            "sub_button": [
+                {
+                    "type": "pic_sysphoto",
+                    "name": "系统拍照发图",
+                    "key": "rselfmenu_1_0",
+                   "sub_button": [ ]
+                 },
+                {
+                    "type": "pic_photo_or_album",
+                    "name": "拍照或者相册发图",
+                    "key": "rselfmenu_1_1",
+                    "sub_button": [ ]
+                },
+                {
+                    "type": "pic_weixin",
+                    "name": "微信相册发图",
+                    "key": "rselfmenu_1_2",
+                    "sub_button": [ ]
+                }
+            ]
+        },
+        {
+            "name": "发送位置",
+            "type": "location_select",
+            "key": "rselfmenu_2_0"
+        },
+        {
+           "type": "media_id",
+           "name": "图片",
+           "media_id": "MEDIA_ID1"
+        },
+        {
+           "type": "view_limited",
+           "name": "图文消息",
+           "media_id": "MEDIA_ID2"
+        }
+    ]
+}
+
+
+//生成自定义菜单
+  echo https_request($menuurl,$data);

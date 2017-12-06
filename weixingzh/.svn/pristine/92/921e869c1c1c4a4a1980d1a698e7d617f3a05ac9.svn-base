@@ -1,0 +1,19 @@
+<?php
+
+$con = mysql_connect('MYSQL5005.webweb.com','9a778b_blog','13145837');
+
+  mysql_select_db('db_9a778b_blog');
+
+  //把数据保存到数据库
+  $time = time();
+  $sql = "INSERT INTO `meida`(`name`, `type`, `media_id`, `createTime`) VALUES ('2312','324234','4234234',$time)";
+  $query = mysql_query($sql);
+  if($query)
+  {
+    echo '<script>alert("上传文件成功~~");location.href="/";</script>';
+  } else {
+    echo '<script>alert("上传文件失败~~");history.back();</script>';
+  }
+
+
+ ?>

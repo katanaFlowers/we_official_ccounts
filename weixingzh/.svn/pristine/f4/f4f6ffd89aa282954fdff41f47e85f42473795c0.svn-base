@@ -1,0 +1,16 @@
+<?php
+
+require("phpanalysis.class.php");
+
+
+  $pa = new PhpAnalysis();             //实例化分词对象
+function fwords($pa,$text)
+{
+  $pa -> SetSource($text);               //传入分词数据
+  $pa -> resultType = 2;                 //指定分词返回类型
+  $pa -> differMax = true;               //是否优化分词结果
+  $pa -> StartAnalysis();                //开始分词
+  $result = $pa -> GetFinallyResult();   //获取分词结果，字符串
+  //$arr = explode(' ',$result);           //字符串转化为数组
+  return $result;
+}

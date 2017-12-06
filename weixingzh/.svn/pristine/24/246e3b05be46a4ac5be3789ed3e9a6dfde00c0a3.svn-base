@@ -1,0 +1,120 @@
+<?php
+header("content-type:text/html;charset=utf-8");
+
+/**
+  * wechat php test
+  */
+
+//define your token
+define("TOKEN", "nnnan");
+//判断是否未验证或是接收消息
+$wechat = new weChat();
+if(isset($_GET['echostr'])){
+  $wechat -> valid();
+} else {
+  $wechat -> responseMsg();
+}
+
+
+class weChat
+{
+  //验证公众号接口配置
+	public function valid()
+    {
+        $echoStr = $_GET["echostr"];
+
+        //valid signature , option
+        if($this->checkSignature()){
+        	echo $echoStr;
+        	exit;
+        }
+    }
+
+    public function responseMsg()
+    {
+		//get post data, May be due to the different environments
+    //接收消息，放在postStr变量 xml格式
+		$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+
+      	//extract post data
+        //返回消息
+		if (!empty($postStr)){
+                //写入日志,G表示收到消息
+                //$this -> logger('G \r\n'.$postStr);
+
+                //xml消息模板
+              	$postObj = simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+                $fromUsername = $postObj->FromUserName;
+                $toUsername = $postObj->ToUserName;
+                $keyword = trim($postObj->Content);
+                $time = time();
+                $textTpl = "<xml>
+							<ToUserName><![CDATA[%s]]></ToUserName>
+							<FromUserName><![CDATA[%s]]></FromUserName>
+							<CreateTime>%s</CreateTime>
+							<MsgType><![CDATA[%s]]></MsgType>
+							<Content><![CDATA[%s]]></Content>
+							<FuncFlag>0</FuncFlag>
+							</xml>";
+				if(!empty( $keyword ))
+                {
+              		$msgType = "text";
+                	$contentStr = "Welcome to wechat world!";
+                  //sprintf函数填充xml模板
+                  $resultStr = sprintf($textTpl, $fromUsername, $toUsername, $time, $msgType, $contentStr);
+                  //写入响应用户的日志信息，用P表示
+                  //$this -> logger('P \r\n'.$resultStr);
+
+                  echo $resultStr;
+
+                }else{
+                	echo "Input something...";
+                }
+
+        }else {
+        	echo "";
+        	exit;
+        }
+    }
+
+//公众号日志写入 logger
+  //private function logger($log_content)
+  //{
+  //  //定义日志文件名
+  //  $log_filename = "log.xml";
+  //  //日志文件的最大尺寸
+  //  $max_size = 10000;
+//
+  //  //如果日志大于最大尺寸就删除它
+  //  if( file_exists($log_filename)  && (abs(filesize($log_filename))>$max_size))
+  //  {
+  //    unlink($log_filename);
+  //  }
+//
+//    //在日志文件中写入日志
+//    flie_put_contents($log_filename,date("Y/m/d H:i:s",time()).' '.$log_content.'\r\n',FILE_APPEND);
+//  }
+
+//核定公众号接口配置暗号
+	private function checkSignature()
+	{
+        $signature = $_GET["signature"];
+        $timestamp = $_GET["timestamp"];
+        $nonce = $_GET["nonce"];
+
+		$token = TOKEN;
+		$tmpArr = array($token, $timestamp, $nonce);
+		sort($tmpArr);
+		$tmpStr = implode( $tmpArr );
+		$tmpStr = sha1( $tmpStr );
+
+		if( $tmpStr == $signature ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+}
+
+
+?>

@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html>
+
+<header>
+  <meta charset="utf-8">
+  <meta name="keywords" content="微信，测试，开发">
+  <meta name="description" content="这是一个用来测试的微网站">
+<title>微网站测试首页</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+
+   <style>
+     * {
+       margin: 0;
+       padding: 0;
+     }
+
+     html,body {
+       height: 100%;
+      background: #e1e0d1;
+     }
+
+     img {
+       vertical-align: middle;
+     }
+
+    li {
+      list-style-type: none;
+    }
+
+    a {
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+     #body {
+       max-width: 640px;
+       min-height: 100%;
+       margin: auto;
+
+     }
+
+     #header {
+       height: 286px;
+       background: pink;
+       width: 100%;
+     }
+
+     #main {
+       width: 96%;
+       height: 300px;
+
+       margin: auto;
+     }
+
+     #tel a {
+
+       font-size: 20px;
+       color: white;
+       margin: auto;
+     }
+
+    #tel {
+      text-align: center;
+      line-height: 40px;
+      width: 100%;
+      background: black;
+      font-size: 18px;
+      border-radius: 5px;
+      color: white;
+    }
+
+    #tel span {
+
+    }
+
+    #list_ul {
+      margin: 10px 5px;
+    }
+
+    #list_ul li {
+      width: 50%;
+      margin: auto;
+      float: left;
+      box-sizing: border-box;
+    }
+
+    #list_ul a {
+      color: #666;
+      text-align: center;
+      margin: 5px;
+      background: #fff;
+      display: block;
+      border-radius: 5px;
+    }
+
+    #list_ul figure div {
+      width: 100px;
+      height: 100px;
+      margin: 5px auto;
+      border: 2px solid white;
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    #list_ul img {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    #banner { position: relative; width: 100%; height: 286px; border: 1px solid #666; overflow: hidden; }
+    #banner_list img { border: 0px; }
+    #banner_bg { position: absolute; bottom: 0; background-color: #000; height: 30px; filter: Alpha(Opacity=30); opacity: 0.3; z-index: 1000; cursor: pointer; width: 100%; }
+    #banner_info { position: absolute; bottom: 0; left: 5px; height: 22px; color: #fff; z-index: 1001; cursor: pointer }
+    #banner_text { position: absolute; width: 120px; z-index: 1002; right: 3px; bottom: 3px; }
+    #banner ul { position: absolute; list-style-type: none; filter: Alpha(Opacity=80); opacity: 0.8; z-index: 1002; margin: 0; padding: 0; bottom: 3px; right: 5px; }
+    #banner ul li { padding: 0px 8px; float: left; display: block; color: #FFF; background: #6f4f67; cursor: pointer; border: 1px solid #333; }
+    #banner ul li.on { background-color: #000; }
+    #banner_list a { position: absolute; }
+
+   </style>
+   <link rel="stylesheet" type="text/css" href="font-awesome-4.7.0/css/font-awesome.min.css">
+   <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+
+   <script type="text/javascript">
+
+   var t = n =0, count;
+
+   $(document).ready(function(){
+
+   count=$("#banner_list a").length;
+
+   $("#banner_list a:not(:first-child)").hide();
+
+   $("#banner_info").html($("#banner_list a:first-child").find("img").attr('alt'));
+
+   $("#banner_info").click(function(){window.open($("#banner_list a:first-child").attr('href'), "_blank")});
+
+   $("#banner li").click(function() {
+
+   var i = $(this).text() -1;//获取Li元素内的值，即1，2，3，4
+
+   n = i;
+
+   if (i >= count) return;
+
+   $("#banner_info").html($("#banner_list a").eq(i).find("img").attr('alt'));
+
+   $("#banner_info").unbind().click(function(){window.open($("#banner_list a").eq(i).attr('href'), "_blank")})
+
+   $("#banner_list a").filter(":visible").fadeOut(500).parent().children().eq(i).fadeIn(1000);
+
+   document.getElementById("banner").style.background="";
+
+   $(this).toggleClass("on");
+
+   $(this).siblings().removeAttr("class");
+
+   });
+
+   t = setInterval("showAuto()", 4000);
+
+   $("#banner").hover(function(){clearInterval(t)}, function(){t = setInterval("showAuto()", 4000);});
+
+   })
+
+
+
+   function showAuto()
+
+   {
+
+   n = n >=(count -1) ?0 : ++n;
+
+   $("#banner li").eq(n).trigger('click');
+
+   }
+
+   </script>
+
+</header>
+
+<body>
+  <section id="body">
+    <header id="header">
+
+      <!-- 轮播 -->
+      <div id="banner">
+
+        <div id="banner_bg"></div>
+
+        <!--标题背景-->
+
+        <div id="banner_info"></div>
+
+        <!--标题-->
+
+        <ul>
+
+          <li class="on">1</li>
+
+          <li>2</li>
+
+          <li>3</li>
+
+          <li>4</li>
+
+        </ul>
+
+        <div id="banner_list">
+
+        	<a href="#" target="_blank"><img src="img/1.jpg" title="" alt="cosPlay"/></a>
+
+          <a href="#" target="_blank"><img src="img/2.jpg" title="" alt="可爱的Tomia和冰雪精灵"/></a>
+
+          <a href="#" target="_blank"><img src="img/3.jpg" title="" alt="毛茸茸的小家伙儿"/></a>
+
+          <a href="#" target="_blank"><img src="img/4.jpg" title="" alt="这是仓科加奈"/></a>
+
+       </div>
+
+      </div>
+
+
+
+    </header>
+
+   <section id="main">
+     <section id="tel">
+       <span class="fa fa-phone"></span><a href="tel:13882303580"> 13882302580</a>
+     </section>
+
+     <section id="cate">
+       <ul id="list_ul">
+         <li>
+        <a href="">
+            <figure>
+              <div>
+              <image src="img/51cd570064414.jpg">
+              </div>
+              <figcaption>
+                点击查看<p>具体消息
+              </figcaption>
+            </figure>
+        </a>
+         </li>
+
+         <li>
+        <a href="">
+            <figure>
+              <div>
+              <image src="img/51cd570064414.jpg">
+              </div>
+              <figcaption>
+                点击查看<p>具体消息
+              </figcaption>
+            </figure>
+        </a>
+         </li>
+
+         <li>
+        <a href="">
+            <figure>
+              <div>
+              <image src="img/51cd570064414.jpg">
+              </div>
+              <figcaption>
+                点击查看<p>具体消息
+              </figcaption>
+            </figure>
+        </a>
+         </li>
+
+         <li>
+        <a href="">
+            <figure>
+              <div>
+              <image src="img/51cd570064414.jpg">
+              </div>
+              <figcaption>
+                点击查看<p>具体消息
+              </figcaption>
+            </figure>
+        </a>
+         </li>
+       </ul>
+     </section>
+
+      <footer>
+      </footer>
+   </section>
+
+       <nav>
+       </nav>
+  </section>
+
+<script src="http://www.jq22.com/js/jq.js"></script>
+
+
+</body>
+</html>

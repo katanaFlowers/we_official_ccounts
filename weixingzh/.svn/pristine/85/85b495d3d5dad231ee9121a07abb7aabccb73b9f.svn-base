@@ -1,0 +1,83 @@
+<?php
+
+
+
+
+//获取access_token函数
+  function https_request($url,$data = null)
+  {
+    //获取一个curl资源
+      $ch = curl_init();
+
+    //设置相关参数
+      curl_setopt($ch,CURLOPT_URL,"$url");
+    //https协议
+      curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
+      curl_setopt($ch,CURLOPT_SSL_VERIFYHOST,false);
+    if(!empty($data))
+    {
+      curl_setopt($ch,CURLOPT_POST,1);
+      curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+    }
+      curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+
+    //获取html结果
+      $output = curl_exec($ch);
+    //释放curl句柄
+      curl_close($ch);
+    //打印获取的信息
+    return $output;
+  }
+
+//获取accesstoken
+  function get_token()
+  {
+    //appID
+      $appID = "wx2706cfd1ecb03462";
+    //APPSECRET
+      $secret = "275d0488db74be5cceb4f420336856f5";
+    //access_token接口
+      $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appID}&secret={$secret}";
+      $result = https_request($url);
+      $result = json_decode($result,true);
+      return $result['access_token'];
+  }
+
+//$access_token取得接口变量
+  $access_token = get_token();
+
+//添加自定义菜单接口url
+  $menuurl =  "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={$access_token}";
+//自定义菜单json数组
+  $data = '{
+    "button":[
+    {
+      "type":"click",
+      "name":"新消息",
+      "key":"wordkey"
+    },
+    {
+      "type":"view",
+      "name":"歌曲",
+      "url":"http://nnnangood66.duapp.com/music/YUI-LIFE.mp3"
+    },
+    {
+      "name":"搜索",
+      "sub_button":[
+        {
+        "type":"view",
+        "name":"百度",
+        "url":"http://baidu.com"
+      },
+      {
+        "type":"view",
+        "name":"Bilibili",
+        "url":"https://www.bilibili.com"
+      }]
+    }]
+  }';
+
+
+//生成自定义菜单
+  $result =  https_request($menuurl,$data);
+  var_dump($result);

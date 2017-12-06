@@ -1,0 +1,43 @@
+<?php
+
+
+
+
+//获取access_token函数
+  function https_request($url,$data = null)
+  {
+    //获取一个curl资源
+      $ch = curl_init();
+
+    //设置相关参数
+      curl_setopt($ch,CURLOPT_URL,"$url");
+    //https协议
+      curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
+      curl_setopt($ch,CURLOPT_SSL_VERIFYHOST,false);
+    if(!empty($data))
+    {
+      curl_setopt($ch,CURLOPT_POST,1);
+      curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+    }
+      curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+
+    //获取html结果
+      $output = curl_exec($ch);
+    //释放curl句柄
+      curl_close($ch);
+    //打印获取的信息
+    return json_decode($output,true);
+  }
+//获取accesstoken
+  function get_token()
+  {
+    //appID
+      $appID = "wx2706cfd1ecb03462";
+    //APPSECRET
+      $secret = "275d0488db74be5cceb4f420336856f5";
+    //access_token接口
+      $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appID}&secret={$secret}";
+      $result = https_request($url);
+      return $result['access_token'];
+  }
+  echo get_token();

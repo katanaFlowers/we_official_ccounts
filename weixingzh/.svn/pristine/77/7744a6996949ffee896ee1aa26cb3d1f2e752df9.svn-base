@@ -1,0 +1,19 @@
+<?php
+header("content-type:text/html;charset=utf-8");
+require("phpanalysis.class.php");
+
+
+               //实例化分词对象
+function fwords($text)
+{
+  $pa = new PhpAnalysis();
+  $pa -> SetSource($text);               //传入分词数据
+  $pa -> resultType = 2;                 //指定分词返回类型
+  $pa -> differMax = true;               //是否优化分词结果
+  $pa -> StartAnalysis();                //开始分词
+  $result = $pa -> GetFinallyResult();   //获取分词结果，字符串
+  //$arr = explode(' ',$result);           //字符串转化为数组
+  return $result;
+}
+
+echo fwords("今天是个好天气");
